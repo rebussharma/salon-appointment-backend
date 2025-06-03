@@ -46,4 +46,10 @@ COPY --from=build /app/target/*.jar app.jar
 # Launches the Spring Boot application.
 ENTRYPOINT ["java", "-jar", "app.jar"]
 
+# Set default environment variables (these will be overridden when container starts)
+ENV DB_URL=jdbc:postgresql://pityingly-proud-camel.data-1.use1.tembo.io:5432/postgres
+ENV DB_USERNAME=postgres
+# Password should be passed at runtime and not included in the image
+ENV DB_PASSWORD=
+
 EXPOSE 8080

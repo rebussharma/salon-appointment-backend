@@ -6,39 +6,42 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.session.SessionManagementFilter;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
 @Configuration
 @EnableWebSecurity
-public class SecurityConfig extends WebSecurityConfigurerAdapter {
+public class SecurityConfig {
 
     @Value("${security.api.token}")
-    private String apiToken;  // Comes from your environment or application.properties
+    private String apiToken;
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .csrf().disable()
-            .authorizeRequests()
-                .antMatchers(HttpMethod.GET, "/api/public/**").permitAll() // Public endpoint
+            .csrf(csrf -> csrf.disable())
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers(HttpMethod.GET, "/api/public/**").permitAll()
                 .anyRequest().authenticated()
-            .and()
+            )
             .addFilterBefore(new TokenFilter(), UsernamePasswordAuthenticationFilter.class)
-            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+            .sessionManagement(sess -> sess.sessionCreationPolicy(
+                org.springframework.security.config.http.SessionCreationPolicy.STATELESS
+            ));
+
+        return http.build();
     }
 
     public class TokenFilter extends OncePerRequestFilter {
-
         @Override
         protected void doFilterInternal(HttpServletRequest request,
                                         HttpServletResponse response,
@@ -51,7 +54,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             }
 
             String token = authHeader.substring(7);
-
             if (!apiToken.equals(token)) {
                 response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                 return;

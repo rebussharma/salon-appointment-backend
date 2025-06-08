@@ -25,6 +25,7 @@ public class AppointmentDetailsDto {
     private String appointmentNotes;
     private String appointmentStatus;
     private DeviceTypeDto bookingDeviceType;
+    private String captchaToken;
 }
 /*
     Note on different date-times:

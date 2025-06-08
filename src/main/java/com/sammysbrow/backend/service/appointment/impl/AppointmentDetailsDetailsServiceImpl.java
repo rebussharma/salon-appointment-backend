@@ -27,7 +27,6 @@ public class AppointmentDetailsDetailsServiceImpl implements AppointmentDetailsS
     private AppointmentDetailsRepository appointmentDetailsRepository;
     private ConfirmationRepository confirmationRepository;
 
-    // Add to your service implementation
     private void validateJsonFields(AppointmentDetailsDto dto) {
         ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
         try {
@@ -55,6 +54,7 @@ public class AppointmentDetailsDetailsServiceImpl implements AppointmentDetailsS
         appointmentDetails.setConfirmationCode(new ConfirmationCodeSequence(savedConfirmCode.getId()));
 
         AppointmentDetails savedAppointment = appointmentDetailsRepository.save(appointmentDetails);
+        appointmentDetailsDto.setCaptchaToken(null);
         return AppointmentDetailsMapper.mapToAppointmentDetailsDto(savedAppointment);
     }
 

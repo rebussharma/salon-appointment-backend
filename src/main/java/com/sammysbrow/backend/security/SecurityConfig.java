@@ -22,7 +22,7 @@ import java.io.IOException;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    @Value("${security.api.token}")
+    @Value("${security.api.bearer.token}")
     private String apiToken;
 
     @Bean

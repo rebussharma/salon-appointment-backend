@@ -23,14 +23,19 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/appointments")
 @AllArgsConstructor
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = {
+    "http://localhost:3000",
+    "https://book.sammysbrow.com"
+})
 public class AppointmentDetailsController {
 
     private AppointmentDetailsService appointmentDetailsService;
     private AppointmentDetailsRepository appointmentDetailsRepository;
 
     @PostMapping
-    public ResponseEntity<AppointmentDetailsDto> addAppointment(@RequestBody AppointmentDetailsDto appointmentDetailsDto) {
+    public ResponseEntity<AppointmentDetailsDto> addAppointment(@RequestBody AppointmentDetailsDto appointmentDetailsDto,
+                                                                @RequestHeader(value = "Authorization", required = false) String authHeader) {
+        System.out.println("AUTH HEADER RECEIVED: " + authHeader);
         AppointmentDetailsDto savedAppointment = appointmentDetailsService.addAppointment(appointmentDetailsDto);
         return new ResponseEntity<>(savedAppointment, HttpStatus.CREATED);
     }
